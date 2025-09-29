@@ -1,0 +1,29 @@
+{
+  "name": "project-1-430",
+  "version": "1.0.0",
+  "description": "Project 1  using a dataset for a server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Test complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlw6563/Project-1-430.git"
+  },
+  "author": "Jake Wardell",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jlw6563/Project-1-430/issues"
+  },
+  "homepage": "https://github.com/jlw6563/Project-1-430#readme",
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.32.0"
+  },
+  "dependencies": {
+    "mime-types": "^3.0.1"
+  }
+}
