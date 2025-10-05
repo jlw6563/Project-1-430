@@ -49,8 +49,7 @@ const parseBody = (request, response, handler) => {
 const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/AddPokemon') {
     parseBody(request, response, responses.addPokemon);
-  }
-  else if (parsedUrl.pathname === '/Caught') parseBody(request, response, responses.caughtPokeomn);
+  } else if (parsedUrl.pathname === '/Caught') parseBody(request, response, responses.caughtPokeomn);
 };
 
 const handleGet = (request, response, parsedUrl) => {
