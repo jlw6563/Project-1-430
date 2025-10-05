@@ -19,6 +19,16 @@ const notFound = (request, response) => {
     response.end();
 };
 
+const respond = (request, response, responseArray) => {
+    responseArray = JSON.stringify(responseArray);
+
+    response.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(responseArray, 'utf8') })
+    if (request.method !== "HEAD") {
+        response.write(responseArray);
+    }
+    response.end();
+}
+
 
 const getPokemonName = (request, response) => {
     let responseArray = [];
@@ -27,14 +37,18 @@ const getPokemonName = (request, response) => {
         responseArray.push(pokemon.name);
     })
 
-    responseArray = JSON.stringify(responseArray);
+    respond(request, response, responseArray);
+}
 
-    response.writeHead(200, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(responseArray, 'utf8') })
-    if (request.method !== "HEAD") {
-        response.write(responseArray);
-    }
-    response.end();
+const getPokemonType = (request, response) => {
+    let responseArray = [];
+
+    dataJson.forEach(pokemon => {
+        responseArray.push({ "name": pokemon.name, "type": pokemon.type });
+    })
+
+    respond(request, response, responseArray);
 
 }
 
-module.exports = { sendPage, notFound, getPokemonName };
+module.exports = { sendPage, notFound, getPokemonName, getPokemonType };
