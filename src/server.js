@@ -9,7 +9,7 @@ const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
 // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
 // https://www.geeksforgeeks.org/node-js/node-js-fs-readdirsync-method/
 
-const FILES = fs.readdirSync(`${__dirname}../../files/`);
+const FILES = fs.readdirSync(`${__dirname}/../files/`);
 const PAGE_DIRECTORY = {};
 FILES.forEach((filePath) => {
   const ABOSLUTE_PATH = `${__dirname}../../files/${filePath}`;
