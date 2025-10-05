@@ -1,0 +1,7 @@
+1. I am using the pokedex dataset
+2. I have completed all my endpoints all that should be left if my code works properly is just client side stuff. All my GET endpoints have been test I haven't been able to test the HEAD or POST without my client stuff.
+3. Client Side, I also need to finish it so I can throughly test HEAD requests and POST requests.
+4. My plan which I have already started is making my own version of Static File Hosting. Any file added to the files folder will automatically have a filepath to it created it works so far for both my CSS and HTML client page. To make this I used the mime-types node package which allows me to figure out the mime-type of any file which I can pass to my function which handles the files.
+5. In server.js on lines 12 - 14 I go some of the inspiration for the code through there but modified it heavily for my needs
+   // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
+   // https://www.geeksforgeeks.org/node-js/node-js-fs-readdirsync-method/
