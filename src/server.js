@@ -23,6 +23,7 @@ const API_DIRECTORY = {
   '/PokemonNames': responses.getPokemonName,
   '/PokemonTypes': responses.getPokemonType,
   '/AllPokemon': responses.getAllPokemon,
+  '/AllCaught': responses.getCaughtPokeon
 };
 
 const parseBody = (request, response, handler) => {
