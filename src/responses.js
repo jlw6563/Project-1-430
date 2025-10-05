@@ -82,6 +82,7 @@ const addPokemon = (request, response) => {
             responseSucessful(request, response, responseMessage, responseCode);
             return;
         }
+
         const ID = parseInt(num, 10);
         dataJson.push({
             id: ID,
@@ -95,9 +96,36 @@ const addPokemon = (request, response) => {
             weaknesses: [
             ],
         });
+
+        responseSucessful(request, response, responseMessage, responseCode);
+    }
+};
+
+const caughtPokeomn = (request, response) => {
+    const responseMessage = {
+        message: 'Pokemon Not Found',
+    };
+
+    const {
+        name
+    } = request.body;
+
+    if (!name) {
+        responseMessage.id = 'PokemonNotFound';
+        failedResponse(request, response, responseMessage, 400);
+        return;
+    }
+
+    for (let i = 0; i < dataJson.length; i++) {
+        if (dataJson[i].name === name) {
+            dataJson[i].caught = true;
+            responseMessage.message = 'Updated Pokemon';
+            responseSucessful(request, response, responseMessage, 201);
+            return;
+        }
     }
 };
 
 module.exports = {
-    sendPage, failedResponse, getPokemonName, getPokemonType, getAllPokemon, addPokemon,
+    sendPage, failedResponse, getPokemonName, getPokemonType, getAllPokemon, addPokemon, caughtPokeomn
 };
