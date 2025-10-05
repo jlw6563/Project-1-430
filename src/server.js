@@ -21,7 +21,8 @@ FILES.forEach((filePath) => {
 
 const API_DIRECTORY = {
   "/PokemonNames": responses.getPokemonName,
-  "/PokemonTypes": responses.getPokemonType
+  "/PokemonTypes": responses.getPokemonType,
+  "/AllPokemon": responses.getAllPokemon
 };
 
 

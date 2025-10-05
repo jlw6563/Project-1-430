@@ -51,4 +51,12 @@ const getPokemonType = (request, response) => {
 
 }
 
-module.exports = { sendPage, notFound, getPokemonName, getPokemonType };
+const getAllPokemon = (request, response) => {
+    let responseArray = [];
+    dataJson.forEach(pokemon => {
+        responseArray.push({ "PokedexNum": pokemon.num, "Name": pokemon.name, "Type": pokemon.type, "Weakness": pokemon.weaknesses, "Next Evolution": pokemon.next_evolution, "Height": pokemon.height, "Weight": pokemon.weight })
+    })
+    respond(request, response, responseArray);
+}
+
+module.exports = { sendPage, notFound, getPokemonName, getPokemonType, getAllPokemon };
