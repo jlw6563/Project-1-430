@@ -1,8 +1,8 @@
 const http = require('http');
 const fs = require('fs');
+const query = require('querystring');
 const mime = require('mime-types');
-const responses = require("./responses.js");
-
+const responses = require('./responses.js');
 
 const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
 
@@ -16,15 +16,14 @@ FILES.forEach((filePath) => {
   const FILE_CONTENT = fs.readFileSync(ABOSLUTE_PATH);
   const MIME_TYPE = mime.lookup(ABOSLUTE_PATH);
   PAGE_DIRECTORY[`/${filePath}`] = { content: FILE_CONTENT, type: MIME_TYPE };
-  if (filePath === "client.html") PAGE_DIRECTORY["/"] = { content: FILE_CONTENT, type: MIME_TYPE };
+  if (filePath === 'client.html') PAGE_DIRECTORY['/'] = { content: FILE_CONTENT, type: MIME_TYPE };
 });
 
 const API_DIRECTORY = {
-  "/PokemonNames": responses.getPokemonName,
-  "/PokemonTypes": responses.getPokemonType,
-  "/AllPokemon": responses.getAllPokemon
+  '/PokemonNames': responses.getPokemonName,
+  '/PokemonTypes': responses.getPokemonType,
+  '/AllPokemon': responses.getAllPokemon,
 };
-
 
 const parseBody = (request, response, handler) => {
   const BODY = [];
@@ -48,41 +47,26 @@ const parseBody = (request, response, handler) => {
 };
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
-    parseBody(request, response, jsonHandler.addUser);
+  if (parsedUrl.pathname === '/AddPokemon') {
+    parseBody(request, response, responses.addPokemon);
   }
 };
 
 const handleGet = (request, response, parsedUrl) => {
   if (PAGE_DIRECTORY[parsedUrl.pathname]) responses.sendPage(request, response, PAGE_DIRECTORY[parsedUrl.pathname]);
   else if (API_DIRECTORY[parsedUrl.pathname]) API_DIRECTORY[parsedUrl.pathname](request, response);
-  else { responses.notFound(request, response) }
-
-  // if (parsedUrl.pathname === '/') {
-  //     responses.getIndex(request, response);
-  // } else if (parsedUrl.pathname === '/style.css') {
-  //     responses.getCSS(request, response);
-  // } else if (parsedUrl.pathname === '/getUsers') {
-  //     jsonHandler.getUsers(request, response);
-  // } else {
-  //     responses.notFound(request, response);
-  // }
+  else responses.failedResponse(request, response);
 };
-
-
 
 const onRequest = (request, response) => {
   const PROTOCOL = request.connection.encrypted ? 'https' : 'http';
   const PARSED_URL = new URL(request.url, `${PROTOCOL}://${request.headers.host}`);
 
-  handleGet(request, response, PARSED_URL);
-  // if (request.method === 'POST') {
-  //   handlePost(request, response, parsedUrl);
-  // } else {
-  //   handleGet(request, response, parsedUrl, request.url);
-  // }
-
-
+  if (request.method === 'POST') {
+    handlePost(request, response, PARSED_URL);
+  } else {
+    handleGet(request, response, PARSED_URL);
+  }
 };
 
 http.createServer(onRequest).listen(PORT, () => {
