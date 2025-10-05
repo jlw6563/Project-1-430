@@ -4,72 +4,76 @@ const mime = require('mime-types');
 const responses = require("./responses.js");
 
 
-const port = process.env.PORT || process.env.NODE_PORT || 3000;
+const PORT = process.env.PORT || process.env.NODE_PORT || 3000;
 
 // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
 // https://www.geeksforgeeks.org/node-js/node-js-fs-readdirsync-method/
 
-const files = fs.readdirSync(`${__dirname}../../files/`);
-const directory = {};
-files.forEach((filePath) => {
-  const absoulutePath = `${__dirname}../../files/${filePath}`;
-  const fileContent = fs.readFileSync(absoulutePath);
-  directory[`/${filePath}`] = { content: fileContent, type: mime.lookup(absoulutePath) };
-  if(filePath === "client.html") directory["/"] = { content: fileContent, type: mime.lookup(fileContent) };
+const FILES = fs.readdirSync(`${__dirname}../../files/`);
+const PAGE_DIRECTORY = {};
+FILES.forEach((filePath) => {
+  const ABOSLUTE_PATH = `${__dirname}../../files/${filePath}`;
+  const FILE_CONTENT = fs.readFileSync(ABOSLUTE_PATH);
+  const MIME_TYPE = mime.lookup(ABOSLUTE_PATH);
+  PAGE_DIRECTORY[`/${filePath}`] = { content: FILE_CONTENT, type: MIME_TYPE };
+  if (filePath === "client.html") PAGE_DIRECTORY["/"] = { content: FILE_CONTENT, type: MIME_TYPE };
 });
 
-console.log(directory);
+const API_DIRECTORY = {
+  "/PokemonNames": responses.getPokemonName
+};
+
 
 const parseBody = (request, response, handler) => {
-    const body = [];
+  const BODY = [];
 
-    request.on('error', (err) => {
-        console.dir(err);
-        response.statusCode = 400;
-        response.end();
-    });
+  request.on('error', (err) => {
+    console.dir(err);
+    response.statusCode = 400;
+    response.end();
+  });
 
-    request.on('data', (chunk) => {
-        body.push(chunk);
-    });
+  request.on('data', (chunk) => {
+    BODY.push(chunk);
+  });
 
-    request.on('end', () => {
-        const bodyString = Buffer.concat(body).toString();
-        request.body = query.parse(bodyString);
+  request.on('end', () => {
+    const BODY_STRING = Buffer.concat(BODY).toString();
+    request.body = query.parse(BODY_STRING);
 
-        handler(request, response);
-    });
+    handler(request, response);
+  });
 };
 
 const handlePost = (request, response, parsedUrl) => {
-    if (parsedUrl.pathname === '/addUser') {
-        parseBody(request, response, jsonHandler.addUser);
-    }
+  if (parsedUrl.pathname === '/addUser') {
+    parseBody(request, response, jsonHandler.addUser);
+  }
 };
 
 const handleGet = (request, response, parsedUrl) => {
-  console.log(parsedUrl);
-    if(directory[parsedUrl.pathname]) responses.sendPage(request,response, directory[parsedUrl.pathname]);
-    else { responses.notFound(request, response)}
-  
+  if (PAGE_DIRECTORY[parsedUrl.pathname]) responses.sendPage(request, response, PAGE_DIRECTORY[parsedUrl.pathname]);
+  else if (API_DIRECTORY[parsedUrl.pathname]) API_DIRECTORY[parsedUrl.pathname](request, response);
+  else { responses.notFound(request, response) }
+
   // if (parsedUrl.pathname === '/') {
-    //     responses.getIndex(request, response);
-    // } else if (parsedUrl.pathname === '/style.css') {
-    //     responses.getCSS(request, response);
-    // } else if (parsedUrl.pathname === '/getUsers') {
-    //     jsonHandler.getUsers(request, response);
-    // } else {
-    //     responses.notFound(request, response);
-    // }
+  //     responses.getIndex(request, response);
+  // } else if (parsedUrl.pathname === '/style.css') {
+  //     responses.getCSS(request, response);
+  // } else if (parsedUrl.pathname === '/getUsers') {
+  //     jsonHandler.getUsers(request, response);
+  // } else {
+  //     responses.notFound(request, response);
+  // }
 };
 
 
 
 const onRequest = (request, response) => {
-  const protocol = request.connection.encrypted ? 'https' : 'http';
-  const parsedUrl = new URL(request.url, `${protocol}://${request.headers.host}`);
+  const PROTOCOL = request.connection.encrypted ? 'https' : 'http';
+  const PARSED_URL = new URL(request.url, `${PROTOCOL}://${request.headers.host}`);
 
-  handleGet(request,response,parsedUrl);
+  handleGet(request, response, PARSED_URL);
   // if (request.method === 'POST') {
   //   handlePost(request, response, parsedUrl);
   // } else {
@@ -79,6 +83,6 @@ const onRequest = (request, response) => {
 
 };
 
-http.createServer(onRequest).listen(port, () => {
-  console.log(`Listening on 127.0.0.1: ${port}`);
+http.createServer(onRequest).listen(PORT, () => {
+  console.log(`Listening on 127.0.0.1: ${PORT}`);
 });
