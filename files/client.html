@@ -3,11 +3,117 @@
   <head>
     <title>Our simple HTTP server</title>
     <link rel="stylesheet" type="text/css" href="/style.css" />
+    <script>
+      const handleResponse = async (response, method) => {
+        const content = document.querySelector("#content");
+
+        switch (response.status) {
+          case 200:
+            content.innerHTML = `<b>Success</b>`;
+            break;
+          case 201:
+            content.innerHTML = "<b>Created</b>";
+            break;
+          case 204:
+            content.innerHTML = "<b>Updated (No Content)</b>";
+            return;
+          case 400:
+            content.innerHTML = `<b>Bad Request</b>`;
+            break;
+          case 404:
+            content.innerHTML = `<b>Not Found</b>`;
+            break;
+          default:
+            content.innerHTML = `Error code not implemented by client.`;
+            break;
+        }
+
+        if (method === "post") {
+          let obj = await response.json();
+          content.innerHTML += `<p>${obj.message}</p>`;
+        } else if (method === "get") {
+          let obj = await response.json();
+          let jsonString = JSON.stringify(obj);
+          content.innerHTML += `<p>${jsonString}</p>`;
+        } else {
+          content.innerHTML += "<p>Meta Data Received</p>";
+        }
+      };
+
+      const sendPost = async (nameForm) => {
+        const url = nameForm.getAttribute("action");
+        const method = nameForm.getAttribute("method");
+
+        const nameField = nameForm.querySelector("#nameField");
+        const ageField = nameForm.querySelector("#ageField");
+
+        const formData = `name=${nameField.value}&age=${ageField.value}`;
+
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+          },
+          body: formData,
+        });
+
+        handleResponse(response, method);
+      };
+
+      const sendGet = async (nameForm) => {
+        const url = userForm.querySelector("#urlField").value;
+        const method = userForm.querySelector("#methodSelect").value;
+
+        let response = await fetch(url, {
+          method,
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        handleResponse(response, method);
+      };
+
+      const init = () => {
+        const ADD_POKEMON_FORM = document.querySelector("#addPokemon");
+        const getForm = document.querySelector("#userForm");
+
+        const addPokemon = (e) => {
+          e.preventDefault();
+          sendPost
+        }
+
+        // const addUser = (e) => {
+        //   e.preventDefault();
+        //   sendPost(postForm);
+        //   return false;
+        // };
+
+        // const getUsers = (e) => {
+        //   e.preventDefault();
+        //   sendGet(getForm);
+        //   return false;
+        // };
+
+        ADD_POKEMON_FORM.addEventListener("submit", (e) => {
+          e.preventDefault();
+          sendPost(ADD_POKEMON_FORM);
+          return false;
+        })
+
+        postForm.addEventListener("submit", addUser);
+
+        getForm.addEventListener("submit", getUsers);
+      };
+
+      window.onload = init;
+    </script>
   </head>
   <body>
     <section id="top">
       <h3>Pokedex</h3>
-      <!-- <form id="nameForm" action="/addPokemon" method="post">
+      <form id="addPokemon" action="/addPokemon" method="post">
         <label for="name">Name: </label>
         <input id="nameField" type="text" name="name" />
         <label for="age">Age: </label>
@@ -21,17 +127,49 @@
         />
         <input type="submit" value="Add User" />
       </form>
-      <form id="userForm" action="/getUsers" method="get">
-        <select id="urlField">
-          <option value="/getUsers">/getUsers</option>
-          <option value="/notReal">/notReal</option>
-        </select>
+      <form id="caughtPokemon" action="/Caught" method="post">
+        <label for="caught">Num: </label>
+        <input
+          id="caught"
+          type="number"
+          name="caught"
+          min="1"
+          step="1"
+        />
+        <input type="submit" value="Mark Caught" />
+      </form>
+      <form id="userForm" action="/PokemonNames" method="get">
+        <label for="methodSelect">Get All Pokemon Names</label>
         <select id="methodSelect">
           <option value="get">GET</option>
           <option value="head">HEAD</option>
         </select>
-        <input type="submit" value="Get User" />
-      </form> -->
+        <input type="submit" value="Get Pokemon Names" />
+      </form>
+      <form id="userForm" action="/PokemonTypes" method="get">
+        <label for="methodSelect">Get All Pokemon's type</label>
+        <select id="methodSelect">
+          <option value="get">GET</option>
+          <option value="head">HEAD</option>
+        </select>
+        <input type="submit" value="Get Pokemon Types" />
+      </form>
+      <form id="userForm" action="/AllPokemon" method="get">
+        <label for="methodSelect">Get All Data About Pokemon</label>
+        <select id="methodSelect">
+          <option value="get">GET</option>
+          <option value="head">HEAD</option>
+        </select>
+        <input type="submit" value="Get Pokemon Data" />
+      </form>
+      <form id="userForm" action="/AllCaught" method="get">
+        <label for="methodSelect">Get All Caught Pokemon</label>
+        <select id="methodSelect">
+          <option value="get">GET</option>
+          <option value="head">HEAD</option>
+        </select>
+        <input type="submit" value="Get Pokemon Types" />
+      </form>
     </section>
     <section id="content"></section>
   </body>
