@@ -68,6 +68,7 @@ const getCaughtPokeon = (request, response) => {
 };
 
 const addPokemon = (request, response) => {
+  console.log("Started adding pokemon");
   const responseMessage = {
     message: 'Missing Params',
   };
@@ -78,7 +79,7 @@ const addPokemon = (request, response) => {
 
   if (!num || !name || !height || !weight) {
     responseMessage.id = 'missingParams';
-    failedResponse(request, response, responseMessage, 400);
+    failedResponse(request, response, JSON.stringify(responseMessage), 400);
     return;
   }
 
@@ -119,20 +120,21 @@ const caughtPokeomn = (request, response) => {
   };
 
   const {
-    name,
+    caught,
   } = request.body;
-
-  if (!name) {
+  console.log(request.body);
+  console.log(caught);
+  if (!caught) {
     responseMessage.id = 'PokemonNotFound';
-    failedResponse(request, response, responseMessage, 400);
+    failedResponse(request, response, JSON.stringify(responseMessage), 400);
     return;
   }
 
   for (let i = 0; i < dataJson.length; i++) {
-    if (dataJson[i].name === name) {
+    if (dataJson[i].name.toLowerCase().trim() === caught.toLowerCase().trim()) {
       dataJson[i].caught = true;
       responseMessage.message = 'Updated Pokemon';
-      responseSucessful(request, response, responseMessage, 201);
+      responseSucessful(request, response, JSON,stringify(responseMessage), 201);
       return;
     }
   }

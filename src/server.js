@@ -51,23 +51,25 @@ const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/AddPokemon') {
     parseBody(request, response, responses.addPokemon);
   } else if (parsedUrl.pathname === '/Caught') parseBody(request, response, responses.caughtPokeomn);
+  else responses.failedResponse(request,response);
 };
 
 const handleGet = (request, response, parsedUrl) => {
   if (PAGE_DIRECTORY[parsedUrl.pathname]) responses.sendPage(request, response, PAGE_DIRECTORY[parsedUrl.pathname]);
   else if (API_DIRECTORY[parsedUrl.pathname]) API_DIRECTORY[parsedUrl.pathname](request, response);
-  else responses.failedResponse(request, response);
+  else responses.failedResponse(request,response);
 };
 
 const onRequest = (request, response) => {
   const PROTOCOL = request.connection.encrypted ? 'https' : 'http';
   const PARSED_URL = new URL(request.url, `${PROTOCOL}://${request.headers.host}`);
 
-  if (request.method === 'POST') {
+  if (request.method === 'POST')
     handlePost(request, response, PARSED_URL);
-  } else {
+  else
     handleGet(request, response, PARSED_URL);
-  }
+  
+  
 };
 
 http.createServer(onRequest).listen(PORT, () => {

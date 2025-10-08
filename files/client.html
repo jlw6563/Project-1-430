@@ -41,24 +41,18 @@
       };
 
       const sendPost = async (nameForm) => {
-        const url = nameForm.getAttribute("action");
-        const method = nameForm.getAttribute("method");
-
-        const nameField = nameForm.querySelector("#nameField");
-        const ageField = nameForm.querySelector("#ageField");
-
-        const formData = `name=${nameField.value}&age=${ageField.value}`;
-
-        const response = await fetch(url, {
-          method: method,
+        const FORM_DATA = new FormData(nameForm);
+        const JSON_DATA = new URLSearchParams(FORM_DATA);
+        const response = await fetch(nameForm.getAttribute("action"), {
+          method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Accept: "application/json",
           },
-          body: formData,
+          body: JSON_DATA,
         });
 
-        handleResponse(response, method);
+        handleResponse(response, "post");
       };
 
       const sendGet = async (nameForm) => {
@@ -77,12 +71,8 @@
 
       const init = () => {
         const ADD_POKEMON_FORM = document.querySelector("#addPokemon");
+        const CAUGHT_POKEMON_FORM = document.querySelector("#caughtPokemon")
         const getForm = document.querySelector("#userForm");
-
-        const addPokemon = (e) => {
-          e.preventDefault();
-          sendPost
-        }
 
         // const addUser = (e) => {
         //   e.preventDefault();
@@ -102,9 +92,15 @@
           return false;
         })
 
-        postForm.addEventListener("submit", addUser);
+        CAUGHT_POKEMON_FORM.addEventListener("submit", (e) => {
+          e.preventDefault();
+          sendPost(CAUGHT_POKEMON_FORM);
+          return false;
+        })
 
-        getForm.addEventListener("submit", getUsers);
+        //postForm.addEventListener("submit", addUser);
+
+        //getForm.addEventListener("submit", getUsers);
       };
 
       window.onload = init;
@@ -113,7 +109,7 @@
   <body>
     <section id="top">
       <h3>Pokedex</h3>
-      <form id="addPokemon" action="/addPokemon" method="post">
+      <form id="addPokemon" action="/AddPokemon" method="post">
         <label for="name">Name: </label>
         <input id="nameField" type="text" name="name" />
         <label for="age">Age: </label>
@@ -128,13 +124,11 @@
         <input type="submit" value="Add User" />
       </form>
       <form id="caughtPokemon" action="/Caught" method="post">
-        <label for="caught">Num: </label>
+        <label for="caught">Pokemon Name: </label>
         <input
           id="caught"
-          type="number"
+          type="text"
           name="caught"
-          min="1"
-          step="1"
         />
         <input type="submit" value="Mark Caught" />
       </form>
