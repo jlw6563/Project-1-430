@@ -42,6 +42,7 @@
 
       const sendPost = async (nameForm) => {
         const FORM_DATA = new FormData(nameForm);
+        console.log("Sending Post!");
         const JSON_DATA = new URLSearchParams(FORM_DATA);
         const response = await fetch(nameForm.getAttribute("action"), {
           method: "POST",
@@ -56,10 +57,8 @@
       };
 
       const sendGet = async (nameForm) => {
-        const url = userForm.querySelector("#urlField").value;
-        const method = userForm.querySelector("#methodSelect").value;
-
-        let response = await fetch(url, {
+        const method = nameForm.querySelector("#methodSelect").value;
+        let response = await fetch(nameForm.getAttribute("action"), {
           method,
           headers: {
             Accept: "application/json",
@@ -70,44 +69,23 @@
       };
 
       const init = () => {
-        const postForms = [
+        const Forms = [
           document.querySelector("#addPokemon"),
           document.querySelector("#caughtPokemon"),
+          document.querySelector("#allCaught"),
+          document.querySelector("#allNames"),
+          document.querySelector("#allTypes"),
+          document.querySelector("#allPokemon"),
         ];
-        const getForms = [];
-        const ALL_CAUGHT_FORM = document.querySelector("#allCaught");
 
-        // const addUser = (e) => {
-        //   e.preventDefault();
-        //   sendPost(postForm);
-        //   return false;
-        // };
-
-        // const getUsers = (e) => {
-        //   e.preventDefault();
-        //   sendGet(getForm);
-        //   return false;
-        // };
-
-        postForms.forEach((form) => {
+        Forms.forEach((form) => {
           form.addEventListener("submit", (e) => {
             e.preventDefault();
-            sendPost(form);
+            if (form.getAttribute("method") === "post") sendPost(form);
+            else sendGet(form);
             return false;
           });
         });
-
-        // ADD_POKEMON_FORM.addEventListener("submit", (e) => {});
-
-        // CAUGHT_POKEMON_FORM.addEventListener("submit", (e) => {
-        //   e.preventDefault();
-        //   sendPost(CAUGHT_POKEMON_FORM);
-        //   return false;
-        // });
-
-        //postForm.addEventListener("submit", addUser);
-
-        //getForm.addEventListener("submit", getUsers);
       };
 
       window.onload = init;
@@ -133,7 +111,8 @@
         <input id="caughtField" type="text" name="caught" />
         <input type="submit" value="Mark Caught" />
       </form>
-      <form id="userForm" action="/PokemonNames" method="get">
+
+      <form id="allNames" action="/PokemonNames" method="get">
         <label for="methodSelect">Get All Pokemon Names</label>
         <select id="methodSelect">
           <option value="get">GET</option>
@@ -141,7 +120,7 @@
         </select>
         <input type="submit" value="Get Pokemon Names" />
       </form>
-      <form id="userForm" action="/PokemonTypes" method="get">
+      <form id="allTypes" action="/PokemonTypes" method="get">
         <label for="methodSelect">Get All Pokemon's type</label>
         <select id="methodSelect">
           <option value="get">GET</option>
@@ -149,7 +128,7 @@
         </select>
         <input type="submit" value="Get Pokemon Types" />
       </form>
-      <form id="userForm" action="/AllPokemon" method="get">
+      <form id="allPokemon" action="/AllPokemon" method="get">
         <label for="methodSelect">Get All Data About Pokemon</label>
         <select id="methodSelect">
           <option value="get">GET</option>
@@ -163,7 +142,7 @@
           <option value="get">GET</option>
           <option value="head">HEAD</option>
         </select>
-        <input type="submit" value="Get Pokemon Types" />
+        <input type="submit" value="Get Pokemon Caught" />
       </form>
     </section>
     <section id="content"></section>
