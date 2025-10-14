@@ -34,11 +34,19 @@ const getPokemonName = (request, response) => {
   responseSucessful(request, response, responseArray);
 };
 
-const getPokemonType = (request, response) => {
-  const responseArray = [];
+const getPokemonType = (request, response, parsedUrl) => {
+  let responseArray = [];
+  let typeFilter;
 
-  dataJson.forEach((pokemon) => {
-    responseArray.push({ name: pokemon.name, type: pokemon.type });
+  //If there is no queryParams parsedURL will be undefined
+  if (parsedUrl) typeFilter = parsedUrl.searchParams.get("type");
+
+  dataJson.forEach(pokemon => {
+    let typeArrayFormatted = pokemon.type.map((type) => type.toLowerCase())
+    if (typeFilter) {
+      if (typeArrayFormatted.includes(typeFilter)) responseArray.push({ name: pokemon.name, type: pokemon.type });
+    }
+    else responseArray.push({ name: pokemon.name, type: pokemon.type })
   });
 
   responseSucessful(request, response, responseArray);
@@ -67,7 +75,6 @@ const getCaughtPokeon = (request, response) => {
 };
 
 const addPokemon = (request, response) => {
-  console.log("Started adding pokemon");
   const responseMessage = {
     message: 'Missing Params',
   };
@@ -103,10 +110,9 @@ const addPokemon = (request, response) => {
     weaknesses: [
     ],
   });
-  responseMessage.message = "Added Pokemon"
+  responseMessage.message = 'Added Pokemon';
 
-  responseSucessful(request, response, responseMessage, responseCode);
-
+  return responseSucessful(request, response, responseMessage, responseCode);
 };
 
 const caughtPokeomn = (request, response) => {
@@ -117,8 +123,7 @@ const caughtPokeomn = (request, response) => {
   const {
     caught,
   } = request.body;
-  console.log(request.body);
-  console.log(caught);
+
   if (!caught) {
     responseMessage.id = 'PokemonNotFound';
     failedResponse(request, response, JSON.stringify(responseMessage), 400);

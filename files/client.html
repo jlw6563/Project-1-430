@@ -4,9 +4,11 @@
     <title>Our simple HTTP server</title>
     <link rel="stylesheet" type="text/css" href="/style.css" />
     <script>
+      //Handles responses that are returned
       const handleResponse = async (response, method) => {
         const content = document.querySelector("#content");
 
+        //Responds based on the status code
         switch (response.status) {
           case 200:
             content.innerHTML = `<b>Success</b>`;
@@ -28,6 +30,7 @@
             break;
         }
 
+        //If for post, get, or head
         if (method === "post") {
           let obj = await response.json();
           content.innerHTML += `<p>${obj.message}</p>`;
@@ -40,10 +43,15 @@
         }
       };
 
+      //Sends a post request by taking the form
       const sendPost = async (nameForm) => {
+        //Turns the form into a FormData object
+        //Then into JSONFormat that can be sent to parse body
         const FORM_DATA = new FormData(nameForm);
-        console.log("Sending Post!");
         const JSON_DATA = new URLSearchParams(FORM_DATA);
+
+        //Gets the URL from the action
+        //Then sets the proper data fields
         const response = await fetch(nameForm.getAttribute("action"), {
           method: "POST",
           headers: {
@@ -53,12 +61,42 @@
           body: JSON_DATA,
         });
 
+        //Handles the result
         handleResponse(response, "post");
       };
 
+      //Sends a get request using the name form
       const sendGet = async (nameForm) => {
+        //Gets the method for head or get
+        //Gets the url using the action of the form
+        //Gets all query params for the form based on the class
         const method = nameForm.querySelector("#methodSelect").value;
-        let response = await fetch(nameForm.getAttribute("action"), {
+        let url = nameForm.getAttribute("action");
+        let queryParams = nameForm.querySelectorAll(".queryParam");
+
+        //For figuring out if this is the first query param
+        let firstQueryParam = false;
+
+        //Goes through the list of query params
+        queryParams.forEach((param) => {
+          let paramFormatted = param.value.toLowerCase().trim();
+
+          //First checks if the param is empty
+          if (paramFormatted !== "") {
+            //If this is the first param
+            if (firstQueryParam === false) {
+              //Sets it to true so all other params go second/through the else
+              firstQueryParam = true;
+              url += `?${param.name}=${paramFormatted}`;
+            } else {
+              url += `&${param.name}=${paramFormatted}`;
+            }
+          }
+        });
+
+        console.log(url);
+
+        let response = await fetch(url, {
           method,
           headers: {
             Accept: "application/json",
@@ -120,14 +158,18 @@
         </select>
         <input type="submit" value="Get Pokemon Names" />
       </form>
+
       <form id="allTypes" action="/PokemonTypes" method="get">
         <label for="methodSelect">Get All Pokemon's type</label>
         <select id="methodSelect">
           <option value="get">GET</option>
           <option value="head">HEAD</option>
         </select>
+        <label for="">Type Select:</label>
+        <input type="text" name="type" class="queryParam" />
         <input type="submit" value="Get Pokemon Types" />
       </form>
+
       <form id="allPokemon" action="/AllPokemon" method="get">
         <label for="methodSelect">Get All Data About Pokemon</label>
         <select id="methodSelect">
