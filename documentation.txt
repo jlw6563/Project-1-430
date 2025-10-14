@@ -5,3 +5,6 @@
 5. In server.js on lines 12 - 14 I go some of the inspiration for the code through there but modified it heavily for my needs
    // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
    // https://www.geeksforgeeks.org/node-js/node-js-fs-readdirsync-method/
+
+
+Making note here my code is not passing CI for any reason other then my lines are too long. No actual errors

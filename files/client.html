@@ -70,9 +70,12 @@
       };
 
       const init = () => {
-        const ADD_POKEMON_FORM = document.querySelector("#addPokemon");
-        const CAUGHT_POKEMON_FORM = document.querySelector("#caughtPokemon")
-        const getForm = document.querySelector("#userForm");
+        const postForms = [
+          document.querySelector("#addPokemon"),
+          document.querySelector("#caughtPokemon"),
+        ];
+        const getForms = [];
+        const ALL_CAUGHT_FORM = document.querySelector("#allCaught");
 
         // const addUser = (e) => {
         //   e.preventDefault();
@@ -86,17 +89,21 @@
         //   return false;
         // };
 
-        ADD_POKEMON_FORM.addEventListener("submit", (e) => {
-          e.preventDefault();
-          sendPost(ADD_POKEMON_FORM);
-          return false;
-        })
+        postForms.forEach((form) => {
+          form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            sendPost(form);
+            return false;
+          });
+        });
 
-        CAUGHT_POKEMON_FORM.addEventListener("submit", (e) => {
-          e.preventDefault();
-          sendPost(CAUGHT_POKEMON_FORM);
-          return false;
-        })
+        // ADD_POKEMON_FORM.addEventListener("submit", (e) => {});
+
+        // CAUGHT_POKEMON_FORM.addEventListener("submit", (e) => {
+        //   e.preventDefault();
+        //   sendPost(CAUGHT_POKEMON_FORM);
+        //   return false;
+        // });
 
         //postForm.addEventListener("submit", addUser);
 
@@ -110,26 +117,20 @@
     <section id="top">
       <h3>Pokedex</h3>
       <form id="addPokemon" action="/AddPokemon" method="post">
+        <label for="num">Num: </label>
+        <input id="numField" type="number" name="num" min="0" step="1" />
         <label for="name">Name: </label>
         <input id="nameField" type="text" name="name" />
-        <label for="age">Age: </label>
-        <input
-          id="ageField"
-          type="number"
-          name="age"
-          min="0"
-          max="100"
-          step="1"
-        />
-        <input type="submit" value="Add User" />
+
+        <label for="height">Height: </label>
+        <input id="heightField" type="number" name="height" min="0" step="1" />
+        <label for="weight">Weight: </label>
+        <input id="weightField" type="number" name="weight" min="0" step="1" />
+        <input type="submit" value="Add Pokemon" />
       </form>
       <form id="caughtPokemon" action="/Caught" method="post">
         <label for="caught">Pokemon Name: </label>
-        <input
-          id="caught"
-          type="text"
-          name="caught"
-        />
+        <input id="caughtField" type="text" name="caught" />
         <input type="submit" value="Mark Caught" />
       </form>
       <form id="userForm" action="/PokemonNames" method="get">
@@ -156,7 +157,7 @@
         </select>
         <input type="submit" value="Get Pokemon Data" />
       </form>
-      <form id="userForm" action="/AllCaught" method="get">
+      <form id="allCaught" action="/AllCaught" method="get">
         <label for="methodSelect">Get All Caught Pokemon</label>
         <select id="methodSelect">
           <option value="get">GET</option>

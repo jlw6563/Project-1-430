@@ -17,7 +17,6 @@ const failedResponse = (request, response, content = JSON.stringify({
 
 const responseSucessful = (request, response, object, statusCode = 200) => {
   const objectJson = JSON.stringify(object);
-
   response.writeHead(statusCode, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(objectJson, 'utf8') });
   if (request.method !== 'HEAD') {
     response.write(objectJson);
@@ -79,39 +78,35 @@ const addPokemon = (request, response) => {
 
   if (!num || !name || !height || !weight) {
     responseMessage.id = 'missingParams';
-    failedResponse(request, response, JSON.stringify(responseMessage), 400);
-    return;
+    return failedResponse(request, response, JSON.stringify(responseMessage), 400);
   }
 
   let responseCode = 204;
-
-  for (let i = 0; i < dataJson.length; i++) {
-    if (dataJson[i].num === num) {
-      responseCode = 201;
-      dataJson[i].name = name;
-      dataJson[i].height = height;
-      dataJson[i].weight = weight;
-      responseMessage.message = 'Updated Pokemon';
-      responseSucessful(request, response, responseMessage, responseCode);
-      return;
-    }
-
-    const ID = parseInt(num, 10);
-    dataJson.push({
-      id: ID,
-      num,
-      name,
-      img: '',
-      type: [
-      ],
-      height,
-      weight,
-      weaknesses: [
-      ],
-    });
-
-    responseSucessful(request, response, responseMessage, responseCode);
+  if (dataJson[num - 1]) {
+    dataJson[num - 1].name = name;
+    dataJson[num - 1].height = height;
+    dataJson[num - 1].weight = weight;
+    responseMessage.message = 'Updated Pokemon';
+    return responseSucessful(request, response, responseMessage, responseCode);
   }
+  responseCode = 201;
+  const ID = parseInt(num, 10);
+  dataJson.push({
+    id: ID,
+    num,
+    name,
+    img: '',
+    type: [
+    ],
+    height,
+    weight,
+    weaknesses: [
+    ],
+  });
+  responseMessage.message = "Added Pokemon"
+
+  responseSucessful(request, response, responseMessage, responseCode);
+
 };
 
 const caughtPokeomn = (request, response) => {
@@ -133,8 +128,8 @@ const caughtPokeomn = (request, response) => {
   for (let i = 0; i < dataJson.length; i++) {
     if (dataJson[i].name.toLowerCase().trim() === caught.toLowerCase().trim()) {
       dataJson[i].caught = true;
-      responseMessage.message = 'Updated Pokemon';
-      responseSucessful(request, response, JSON,stringify(responseMessage), 201);
+      responseMessage.message = 'Marked Pokemon Caught';
+      responseSucessful(request, response, JSON.stringify(responseMessage), 204);
       return;
     }
   }
