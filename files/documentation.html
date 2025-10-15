@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pokedex API Documentation</title>
+  </head>
+  <body>
+    <a href="./client.html">To API Testing</a>
+    <h1>Pokedex API Documentation</h1>
+    <div>
+      <h2>Get All Pokemon Names</h2>
+      <p><b>Relative URL:</b> /PokemonNames</p>
+      <p><b>Supported Methods:</b> GET, HEAD</p>
+      <p><b>Query Params:</b> None</p>
+      <p><b>Returns:</b> Array of PokemonName objects. Example: [{ name }]</p>
+      <p><b>Example Usage:</b> GET /PokemonNames</p>
+    </div>
+    <div>
+      <h2>Get Pokemon Names With Types</h2>
+      <p><b>Relative URL:</b> /PokemonTypes</p>
+      <p><b>Supported Methods:</b> GET, HEAD</p>
+      <p>
+        <b>Query Params:</b> type (string, optional) — filter by type. Example:
+        type=fire & weakness (string, optional) — filter by weakness. Example:
+        weakness=water
+      </p>
+      <p>
+        <b>Returns:</b> Array of PokemonType objects. Example: [{ name, type }]
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id=NothingFound</code> Bad Request Nothing Found.
+      </p>
+      <p>
+        <b>Example Usage:</b> GET /PokemonTypes & GET /PokemonTypes?type=fire &
+        GET /PokemonTypes?weakness=water & GET
+        /PokemonTypes?type=fire&amp;weakness=water
+      </p>
+    </div>
+    <div>
+      <h2>Get All Pokemon</h2>
+      <p><b>Relative URL:</b> /AllPokemon</p>
+      <p><b>Supported Methods:</b> GET, HEAD</p>
+      <p>
+        <b>Query Params:</b> type (string, optional) — filter by type & weakness
+        (string, optional) — filter by weakness.
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id=NothingFound</code> Bad Request Nothing Found.
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id= id: 'NothingFound'</code> when required fields are missing.
+      </p>
+      <p>
+        <b>Example Usage:</b> GET /AllPokemon & GET /AllPokemon?type=grass & GET
+        /AllPokemon?weakness=ice & GET /AllPokemon?type=grass&amp;weakness=ice
+      </p>
+    </div>
+    <div>
+      <h2>Get All Caught Pokemon</h2>
+      <p><b>Relative URL:</b> /AllCaught</p>
+      <p><b>Supported Methods:</b> GET, HEAD</p>
+      <p>
+        <b>Query Params:</b> type (string, optional) — additional filter by type
+        applied after caught filter & weakness (string, optional) — additional
+        filter by weakness applied after caught filter.
+      </p>
+      <p>
+        <b>Returns:</b> Array of PokemonFull objects where
+        <code>caught === true</code>.
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id=NothingFound</code> Bad Request Nothing Found.
+      </p>
+      <p><b>Example Usage:</b> GET /AllCaught & GET /AllCaught?type=electric</p>
+    </div>
+    <div>
+      <h2>Add or Update a Pokemon</h2>
+      <p><b>Relative URL:</b> /AddPokemon</p>
+      <p><b>Supported Methods:</b> POST</p>
+      <p>
+        <b>Body Params:</b> num (number, required) — Pokedex number; updates
+        existing if present & name (string, required) — Pokemon name & height
+        (string or number, required) — height value & weight (string or number,
+        required) — weight value.
+      </p>
+
+      <p>
+        <b>Returns:</b> 201 Created with message when a new record is added.
+      </p>
+      <p>
+        <b>Returns:</b> 204 No Content with message when an existing record is
+        updated.
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id=missingParams</code> when required fields are missing.
+      </p>
+      <p><b>Example Usage:</b> POST /AddPokemon</p>
+    </div>
+
+    <div>
+      <h2>Mark Pokemon As Caught</h2>
+      <p><b>Relative URL:</b> /Caught</p>
+      <p><b>Supported Methods:</b> POST</p>
+      <p>
+        <b>Body Params:</b> caught (string, required) — Pokemon name to mark as
+        caught.
+      </p>
+      <p>
+        <b>Returns:</b> 204 No Content with message when the named pokemon is
+        marked as caught.
+      </p>
+      <p>
+        <b>Returns:</b> 400 Bad Request with message and
+        <code>id=PokemonNotFound</code> when name is missing or not found.
+      </p>
+      <p><b>Example Usage:</b> POST /Caught</p>
+    </div>
+  </body>
+</html>

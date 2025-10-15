@@ -1,11 +1,14 @@
-const dataJson = require('../files/pokedex.json');
+const dataJson = require('../pokedex.json');
 
+// Send all the different pages
 const sendPage = (request, response, pageData) => {
   response.writeHead(200, { 'Content-Type': pageData.type });
   response.write(pageData.content);
   response.end();
 };
 
+// For any of the failed responses
+// Has a default of just returning 404. Otherwise can pass in content and status code
 const failedResponse = (request, response, content = JSON.stringify({
   message: 'The page you are looking for was not found',
   id: 'notFound',
@@ -15,6 +18,7 @@ const failedResponse = (request, response, content = JSON.stringify({
   response.end();
 };
 
+// Successful response defaults with the 200 status code
 const responseSucessful = (request, response, object, statusCode = 200) => {
   const objectJson = JSON.stringify(object);
   response.writeHead(statusCode, { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(objectJson, 'utf8') });
@@ -24,61 +28,77 @@ const responseSucessful = (request, response, object, statusCode = 200) => {
   response.end();
 };
 
+// Helper function for filtering the data based on searchParams
+// caughtVal is defualt to false only caught filter will send a true
 const filter = (parsedURL, caughtVal = false) => {
-  let response = dataJson
+  let response = dataJson;
 
-  //If there is no queryParams parsedURL will be undefined
+  // If there is no queryParams parsedURL will be undefined
   if (parsedURL) {
-    let typeFilter = parsedURL.searchParams.get("type");
+    // Does it for the type search filter
+    const typeFilter = parsedURL.searchParams.get('type');
+    // Checks if the typeFilter exists
     if (typeFilter) {
       response = response.filter((pokemon) => {
-        let typeArrayFormatted = pokemon.type.map((type) => type.toLowerCase())
+        const typeArrayFormatted = pokemon.type.map((type) => type.toLowerCase());
         if (typeArrayFormatted.includes(typeFilter)) return true;
         return false;
-      })
+      });
     }
 
-    let weaknessFilter = parsedURL.searchParams.get("weakness");
+    // Weakness filter copy of the typeFilter execept with weakness instead
+    const weaknessFilter = parsedURL.searchParams.get('weakness');
     if (weaknessFilter) {
       response = response.filter((pokemon) => {
-        let weaknessArrayFormatted = pokemon.weaknesses.map((weakness) => weakness.toLowerCase())
+        const weaknessArrayFormatted = pokemon.weaknesses.map((weakness) => weakness.toLowerCase());
         if (weaknessArrayFormatted.includes(weaknessFilter)) return true;
         return false;
-      })
+      });
     }
-
-
   }
-  if (caughtVal) response = response.filter((pokemon) => pokemon.caught)
 
+  // Does the caught pokemon
+  if (caughtVal) response = response.filter((pokemon) => pokemon.caught);
 
   return response;
-}
+};
 
+// Checks if the filtered response has nothing in it
+// Responds with 400 bad request
 const checkFilter = (array, request, response) => {
   if (array.length === 0) {
-    failedResponse(request, response,
-      JSON.stringify({ message: "Bad Request Nothing Found", id: "NothingFound" }), 400);
+    failedResponse(
+      request,
+      response,
+      JSON.stringify({ message: 'Bad Request Nothing Found', id: 'NothingFound' }),
+      400,
+    );
     return true;
   }
-  else return false;
-}
+  return false;
+};
 
-const displayAllData = (responseArray) => {
-  responseArray = responseArray.map((
-    { num, name, type, weaknesses, next_evolution, height, weight }) =>
-    ({ num, name, type, weaknesses, next_evolution, height, weight }));
-  return responseArray;
-}
+// Have several functions that use this helper function for map the data for a specific format
+const displayAllData = (responseArray) => responseArray.map((
+  {
+    num, name, type, weaknesses, height, weight,
+  },
+) => ({
+  num, name, type, weaknesses, height, weight,
+}));
 
+// Returns all the pokemon names
 const getPokemonName = (request, response) => {
+  // Because there is no filtering just uses dataJSON
   let responseArray = dataJson;
 
+  // Maps it so it is just the name
   responseArray = responseArray.map(({ name }) => ({ name }));
 
   responseSucessful(request, response, responseArray);
 };
 
+// Gets all the pokemon names and thata pokemons type
 const getPokemonType = (request, response, parsedURL) => {
   let responseArray = filter(parsedURL);
 
@@ -89,6 +109,7 @@ const getPokemonType = (request, response, parsedURL) => {
   responseSucessful(request, response, responseArray);
 };
 
+// Gets all the data for the pokemon
 const getAllPokemon = (request, response, parsedURL) => {
   let responseArray = filter(parsedURL);
 
@@ -99,6 +120,7 @@ const getAllPokemon = (request, response, parsedURL) => {
   responseSucessful(request, response, responseArray);
 };
 
+// Gets all the caught Pokemon
 const getCaughtPokeon = (request, response, parsedURL) => {
   let responseArray = filter(parsedURL, true);
 
@@ -109,20 +131,25 @@ const getCaughtPokeon = (request, response, parsedURL) => {
   responseSucessful(request, response, responseArray);
 };
 
+// Post request to addPokemon/Update Pokemon
 const addPokemon = (request, response) => {
+  // Defualt Message
   const responseMessage = {
     message: 'Missing Params',
   };
 
+  // Deconstructs the request.body
   const {
     num, name, height, weight,
   } = request.body;
 
+  // If any of the params are missing
   if (!num || !name || !height || !weight) {
     responseMessage.id = 'missingParams';
     return failedResponse(request, response, JSON.stringify(responseMessage), 400);
   }
 
+  // If the num already exists just update the data with the new data
   let responseCode = 204;
   if (dataJson[num - 1]) {
     dataJson[num - 1].name = name;
@@ -131,6 +158,8 @@ const addPokemon = (request, response) => {
     responseMessage.message = 'Updated Pokemon';
     return responseSucessful(request, response, responseMessage, responseCode);
   }
+
+  // Adds in a new pokemon by creating it
   responseCode = 201;
   const ID = parseInt(num, 10);
   dataJson.push({
@@ -150,6 +179,7 @@ const addPokemon = (request, response) => {
   return responseSucessful(request, response, responseMessage, responseCode);
 };
 
+// Adds the caught variable to the pokemon
 const caughtPokeomn = (request, response) => {
   const responseMessage = {
     message: 'Pokemon Not Found',
@@ -159,11 +189,13 @@ const caughtPokeomn = (request, response) => {
     caught,
   } = request.body;
 
+  // If caught was empty
   if (!caught) {
     responseMessage.id = 'PokemonNotFound';
     return failedResponse(request, response, JSON.stringify(responseMessage), 400);
   }
 
+  // Goes throught the list and checks it against the name of the current to see if needs to update
   for (let i = 0; i < dataJson.length; i++) {
     if (dataJson[i].name.toLowerCase().trim() === caught.toLowerCase().trim()) {
       dataJson[i].caught = true;
@@ -172,10 +204,18 @@ const caughtPokeomn = (request, response) => {
     }
   }
 
+  // If we don't return above we couldn't find that name and respond with a failure
   responseMessage.id = 'PokemonNotFound';
   return failedResponse(request, response, JSON.stringify(responseMessage), 400);
 };
 
 module.exports = {
-  sendPage, failedResponse, getPokemonName, getPokemonType, getAllPokemon, addPokemon, caughtPokeomn, getCaughtPokeon,
+  sendPage,
+  failedResponse,
+  getPokemonName,
+  getPokemonType,
+  getAllPokemon,
+  addPokemon,
+  caughtPokeomn,
+  getCaughtPokeon,
 };

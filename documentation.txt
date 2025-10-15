@@ -17,7 +17,7 @@ I can safely say that my skills in reading through MDN docs has significantly im
 
 5. I made my own version of Static File Hosting. Any file added to the files folder will automatically have a filepath to it created it works so 
 far for both my CSS and HTML client page. To make this I used the mime-types node package which allows me to figure out the mime-type of any file 
-which I can pass to my function which handles the files.
+which I can pass to my function which handles the files. I also added a second queryParam.
 
 6. In server.js on lines 12 - 14 I go some of the inspiration for the code through there but modified it heavily for my needs
    // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
