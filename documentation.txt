@@ -1,10 +1,24 @@
 1. I am using the pokedex dataset
-2. I have completed all my endpoints all that should be left if my code works properly is just client side stuff. All my GET endpoints have been test I haven't been able to test the HEAD or POST without my client stuff.
-3. Client Side, I also need to finish it so I can throughly test HEAD requests and POST requests.
-4. My plan which I have already started is making my own version of Static File Hosting. Any file added to the files folder will automatically have a filepath to it created it works so far for both my CSS and HTML client page. To make this I used the mime-types node package which allows me to figure out the mime-type of any file which I can pass to my function which handles the files.
-5. In server.js on lines 12 - 14 I go some of the inspiration for the code through there but modified it heavily for my needs
+
+2. Nothing particularly went wrong, I did however struggle both with query params and with setting up the static file hosting. I also
+really had trouble understand the Array.map() and Array.filter() functions. at the end I got them to work by just constantly trying different things
+and reading docs. I think what contributed to this was whenever I saw the object destructiorizing used as the callback in either function I 
+would get incredibly tripped up on how it worked.
+
+3. I was able to complete all the goals I set out to do including static file hosting and in my opinion an optimazation of the original code.
+I found that there were lots of places that I could implement better practises to reduce the redundency of what I would write later on. This allowed 
+all the files to be much shorter in general.
+
+4.  I learned a lot suprisingly about different built in JS APIs such as the string, URL, JSON, URLParams, Array, ect. 
+They have a lot of useful function and when used in tandem together can help shorthand lots of code. I also feel that my understanding of 
+the web and servers on a deeper level has increased compared to the assignments we had to do. Building it from scratch and piecing everything 
+together was very helpful! Lastly I have always struggled with reading through MDN docs but after this project and the time I have spent in JS,
+I can safely say that my skills in reading through MDN docs has significantly improved!
+
+5. I made my own version of Static File Hosting. Any file added to the files folder will automatically have a filepath to it created it works so 
+far for both my CSS and HTML client page. To make this I used the mime-types node package which allows me to figure out the mime-type of any file 
+which I can pass to my function which handles the files.
+
+6. In server.js on lines 12 - 14 I go some of the inspiration for the code through there but modified it heavily for my needs
    // https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
    // https://www.geeksforgeeks.org/node-js/node-js-fs-readdirsync-method/
-
-
-Making note here my code is not passing CI for any reason other then my lines are too long. No actual errors

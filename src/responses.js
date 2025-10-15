@@ -24,53 +24,88 @@ const responseSucessful = (request, response, object, statusCode = 200) => {
   response.end();
 };
 
-const getPokemonName = (request, response) => {
-  const responseArray = [];
-
-  dataJson.forEach((pokemon) => {
-    responseArray.push(pokemon.name);
-  });
-
-  responseSucessful(request, response, responseArray);
-};
-
-const getPokemonType = (request, response, parsedUrl) => {
-  let responseArray = [];
-  let typeFilter;
+const filter = (parsedURL, caughtVal = false) => {
+  let response = dataJson
 
   //If there is no queryParams parsedURL will be undefined
-  if (parsedUrl) typeFilter = parsedUrl.searchParams.get("type");
-
-  dataJson.forEach(pokemon => {
-    let typeArrayFormatted = pokemon.type.map((type) => type.toLowerCase())
+  if (parsedURL) {
+    let typeFilter = parsedURL.searchParams.get("type");
     if (typeFilter) {
-      if (typeArrayFormatted.includes(typeFilter)) responseArray.push({ name: pokemon.name, type: pokemon.type });
+      response = response.filter((pokemon) => {
+        let typeArrayFormatted = pokemon.type.map((type) => type.toLowerCase())
+        if (typeArrayFormatted.includes(typeFilter)) return true;
+        return false;
+      })
     }
-    else responseArray.push({ name: pokemon.name, type: pokemon.type })
-  });
+
+    let weaknessFilter = parsedURL.searchParams.get("weakness");
+    if (weaknessFilter) {
+      response = response.filter((pokemon) => {
+        let weaknessArrayFormatted = pokemon.weaknesses.map((weakness) => weakness.toLowerCase())
+        if (weaknessArrayFormatted.includes(weaknessFilter)) return true;
+        return false;
+      })
+    }
+
+
+  }
+  if (caughtVal) response = response.filter((pokemon) => pokemon.caught)
+
+
+  return response;
+}
+
+const checkFilter = (array, request, response) => {
+  if (array.length === 0) {
+    failedResponse(request, response,
+      JSON.stringify({ message: "Bad Request Nothing Found", id: "NothingFound" }), 400);
+    return true;
+  }
+  else return false;
+}
+
+const displayAllData = (responseArray) => {
+  responseArray = responseArray.map((
+    { num, name, type, weaknesses, next_evolution, height, weight }) =>
+    ({ num, name, type, weaknesses, next_evolution, height, weight }));
+  return responseArray;
+}
+
+const getPokemonName = (request, response) => {
+  let responseArray = dataJson;
+
+  responseArray = responseArray.map(({ name }) => ({ name }));
 
   responseSucessful(request, response, responseArray);
 };
 
-const getAllPokemon = (request, response) => {
-  const responseArray = [];
-  dataJson.forEach((pokemon) => {
-    responseArray.push({
-      PokedexNum: pokemon.num, Name: pokemon.name, Type: pokemon.type, Weakness: pokemon.weaknesses, 'Next Evolution': pokemon.next_evolution, Height: pokemon.height, Weight: pokemon.weight,
-    });
-  });
+const getPokemonType = (request, response, parsedURL) => {
+  let responseArray = filter(parsedURL);
+
+  if (checkFilter(responseArray, request, response)) return;
+
+  responseArray = responseArray.map(({ name, type }) => ({ name, type }));
+
   responseSucessful(request, response, responseArray);
 };
 
-const getCaughtPokeon = (request, response) => {
-  const responseArray = [];
-  dataJson.forEach((pokemon) => {
-    if (pokemon.caught) {
-      responseArray.push({
-        PokedexNum: pokemon.num, Name: pokemon.name, Type: pokemon.type, Weakness: pokemon.weaknesses, 'Next Evolution': pokemon.next_evolution, Height: pokemon.height, Weight: pokemon.weight,
-      });
-    }
-  });
+const getAllPokemon = (request, response, parsedURL) => {
+  let responseArray = filter(parsedURL);
+
+  if (checkFilter(responseArray, request, response)) return;
+
+  responseArray = displayAllData(responseArray);
+
+  responseSucessful(request, response, responseArray);
+};
+
+const getCaughtPokeon = (request, response, parsedURL) => {
+  let responseArray = filter(parsedURL, true);
+
+  if (checkFilter(responseArray, request, response)) return;
+
+  responseArray = displayAllData(responseArray);
+
   responseSucessful(request, response, responseArray);
 };
 
@@ -126,18 +161,19 @@ const caughtPokeomn = (request, response) => {
 
   if (!caught) {
     responseMessage.id = 'PokemonNotFound';
-    failedResponse(request, response, JSON.stringify(responseMessage), 400);
-    return;
+    return failedResponse(request, response, JSON.stringify(responseMessage), 400);
   }
 
   for (let i = 0; i < dataJson.length; i++) {
     if (dataJson[i].name.toLowerCase().trim() === caught.toLowerCase().trim()) {
       dataJson[i].caught = true;
       responseMessage.message = 'Marked Pokemon Caught';
-      responseSucessful(request, response, JSON.stringify(responseMessage), 204);
-      return;
+      return responseSucessful(request, response, JSON.stringify(responseMessage), 204);
     }
   }
+
+  responseMessage.id = 'PokemonNotFound';
+  return failedResponse(request, response, JSON.stringify(responseMessage), 400);
 };
 
 module.exports = {
